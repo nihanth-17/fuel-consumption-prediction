@@ -1,0 +1,10 @@
+package com.fuelnet.service;
+import com.fuelnet.model.*;import com.fuelnet.repository.*;import org.springframework.beans.factory.annotation.*;import org.springframework.mail.SimpleMailMessage;import org.springframework.mail.javamail.JavaMailSender;import org.springframework.security.crypto.password.PasswordEncoder;import org.springframework.stereotype.Service;import java.security.*;import java.time.*;import java.util.*;
+@Service public class PasswordResetService {
+ private final UserRepository users;private final PasswordResetTokenRepository tokens;private final JavaMailSender mail;private final PasswordEncoder passwords;
+ @Value("${fuelnet.mail.from}") String from; @Value("${fuelnet.reset-url}") String resetUrl;
+ public PasswordResetService(UserRepository u,PasswordResetTokenRepository t,JavaMailSender m,PasswordEncoder p){users=u;tokens=t;mail=m;passwords=p;}
+ public void request(String email){users.findAll().stream().filter(u->email.equalsIgnoreCase(u.getEmail())).findFirst().ifPresent(u->{String raw=random();PasswordResetToken t=new PasswordResetToken();t.setUser(u);t.setTokenHash(hash(raw));t.setExpiresAt(Instant.now().plus(Duration.ofMinutes(30)));tokens.save(t);SimpleMailMessage msg=new SimpleMailMessage();msg.setFrom(from);msg.setTo(u.getEmail());msg.setSubject("FuelNet password reset");msg.setText("Reset your password: "+resetUrl+"?token="+raw);mail.send(msg);});}
+ public void reset(String raw,String password){PasswordResetToken t=tokens.findByTokenHash(hash(raw)).filter(x->x.getUsedAt()==null&&x.getExpiresAt().isAfter(Instant.now())).orElseThrow(()->new IllegalArgumentException("Invalid or expired reset token"));t.getUser().setPassword(passwords.encode(password));t.setUsedAt(Instant.now());users.save(t.getUser());tokens.save(t);}
+ private String random(){byte[] b=new byte[32];new SecureRandom().nextBytes(b);return Base64.getUrlEncoder().withoutPadding().encodeToString(b);} private String hash(String v){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(v.getBytes()));}catch(Exception e){throw new IllegalStateException(e);}}
+}

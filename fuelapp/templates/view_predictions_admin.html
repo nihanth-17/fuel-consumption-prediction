@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Predictions - Fuel AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(168, 237, 234, 0.1);
+            color: #26a69a;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            color: #333;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #a8edea;
+            color: #26a69a;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            padding: 8rem 2rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .page-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .predictions-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .prediction-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .prediction-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .prediction-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .parameters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .param-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .param-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .param-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .results-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+        
+        .result-item {
+            margin-bottom: 1rem;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-value {
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .fuel-low {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .fuel-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .fuel-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .profile-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .profile-aggressive { background: #ff6b6b; color: white; }
+        .profile-moderate { background: #4ecdc4; color: white; }
+        .profile-eco { background: #45b7d1; color: white; }
+        .profile-city { background: #96ceb4; color: white; }
+        .profile-highway { background: #feca57; color: #333; }
+        
+        .graph-section {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .graph-placeholder {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        .admin-badge {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .no-predictions {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+        
+        .no-predictions-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">Fuel AI Admin</div>
+            <div class="nav-links">
+                <div class="admin-badge">Predictions Analytics</div>
+                <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+                <a href="{% url 'upload_dataset' %}">Upload Data</a>
+                <a href="{% url 'train_model' %}">Train Model</a>
+                <a href="{% url 'view_users' %}">Users</a>
+                <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>All User Predictions</h1>
+            <p>Monitor and analyze predictions made by all users across the platform</p>
+        </div>
+
+        <div class="predictions-grid">
+            {% if predictions %}
+                {% for prediction in predictions %}
+                <div class="prediction-card">
+                    <div class="prediction-header">
+                        <div class="user-info">
+                            <div class="user-avatar">{{ prediction.user.username.0|upper }}</div>
+                            <div>
+                                <h3>{{ prediction.user.username }}</h3>
+                                <div class="prediction-date">{{ prediction.prediction_date|date:"M d, Y H:i" }}</div>
+                            </div>
+                        </div>
+                        <div class="prediction-id">#{{ prediction.id }}</div>
+                    </div>
+
+                    <div class="prediction-content">
+                        <div>
+                            <h4>Input Parameters</h4>
+                            <div class="parameters-grid">
+                                <div class="param-item">
+                                    <div class="param-label">Speed</div>
+                                    <div class="param-value">{{ prediction.ecu_data.vehicle_speed }} km/h</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">RPM</div>
+                                    <div class="param-value">{{ prediction.ecu_data.engine_rpm }}</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Throttle</div>
+                                    <div class="param-value">{{ prediction.ecu_data.throttle_position }}%</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Engine Load</div>
+                                    <div class="param-value">{{ prediction.ecu_data.engine_load }}%</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Acceleration</div>
+                                    <div class="param-value">{{ prediction.ecu_data.acceleration }} m/s²</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Gear</div>
+                                    <div class="param-value">{{ prediction.ecu_data.gear_position }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="results-section">
+                            <h4>Prediction Results</h4>
+                            <div class="result-item">
+                                <div class="result-label">Fuel Consumption</div>
+                                <div class="result-value {% if prediction.ecu_data.fuel_consumption_category == 'Low' %}fuel-low{% elif prediction.ecu_data.fuel_consumption_category == 'Medium' %}fuel-medium{% else %}fuel-high{% endif %}">
+                                    {{ prediction.ecu_data.predicted_fuel_consumption|floatformat:2 }} LPH
+                                    ({{ prediction.ecu_data.fuel_consumption_category }})
+                                </div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Driving Profile</div>
+                                <div class="profile-badge profile-{{ prediction.ecu_data.driving_profile|lower }}">
+                                    {{ prediction.ecu_data.driving_profile }}
+                                </div>
+                            </div>
+                            {% if prediction.ecu_data.confidence_score %}
+                            <div class="result-item">
+                                <div class="result-label">Confidence</div>
+                                <div class="result-value">
+                                    {{ prediction.ecu_data.confidence_score|floatformat:2 }}%
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if prediction.graph_image %}
+                    <div class="graph-section">
+                        <h4>Analysis Visualization</h4>
+                        <img src="data:image/png;base64,{{ prediction.graph_image }}" alt="Prediction Analysis" style="max-width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    </div>
+                    {% else %}
+                    <div class="graph-section">
+                        <h4>Analysis Visualization</h4>
+                        <div class="graph-placeholder">
+                            📊 Visualization not available
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-predictions">
+                    <div class="no-predictions-icon">📊</div>
+                    <h3>No Predictions Yet</h3>
+                    <p>Users haven't made any predictions yet. Check back later to see prediction analytics.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

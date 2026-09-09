@@ -1,0 +1,7 @@
+package com.fuelnet.tools;
+import java.io.*; import java.nio.file.*; import java.util.*;
+/** Java replacement for dataset_creator.py. Run with: java ...DatasetGenerator [output.csv] */
+public class DatasetGenerator {
+ public static void main(String[] a) throws IOException { Path p=Path.of(a.length==0?"dataset/ecu_fuel_consumption_data.csv":a[0]);Files.createDirectories(p.getParent());Random r=new Random(42);try(PrintWriter w=new PrintWriter(Files.newBufferedWriter(p))){w.println("vehicle_speed_kmh,engine_rpm,throttle_position_percent,engine_load_percent,maf_gs,intake_air_temp_c,acceleration_ms2,gear_position,fuel_consumption_lph,driving_profile");String[] ps={"Aggressive","Moderate","Eco-Friendly","City","Highway"};for(int i=0;i<10000;i++){String q=ps[r.nextInt(ps.length)];double speed=clamp(q.equals("Highway")?100+r.nextGaussian()*10:q.equals("City")?40+r.nextGaussian()*20:70+r.nextGaussian()*18,0,180),rpm=clamp(q.equals("Aggressive")?3500+r.nextGaussian()*800:2500+r.nextGaussian()*500,600,7000),t=clamp(q.equals("Aggressive")?65+r.nextGaussian()*20:45+r.nextGaussian()*12,0,100),acc=clamp(1.2+r.nextGaussian()*.8,-3,5),load=Math.min(100,rpm*t/3500),maf=Math.max(1,rpm*t*load/10000+r.nextGaussian()*5),fuel=Math.max(1.5,Math.min(15,(maf*rpm*Math.abs(acc+1)*t)/50000*(q.equals("Aggressive")?1.4:q.equals("Eco-Friendly")?.7:1)));w.printf(Locale.US,"%.2f,%.0f,%.2f,%.2f,%.2f,%.2f,%.2f,%d,%.2f,%s%n",speed,rpm,t,load,maf,35+r.nextGaussian()*10,acc,1+r.nextInt(6),fuel,q);}}}
+ static double clamp(double v,double lo,double hi){return Math.max(lo,Math.min(hi,v));}
+}

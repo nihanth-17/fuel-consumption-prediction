@@ -1,0 +1,4 @@
+-- Optional migration from Django's MySQL schema. It is intentionally disabled by default:
+-- copy this into an environment-specific migration only after backing up the source database.
+-- Example mapping: INSERT INTO app_users (id,username,password,email,role,created_at)
+-- SELECT id,username,password,email,'USER',date_joined FROM auth_user;

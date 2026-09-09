@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Fuel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .container {
+            padding: 8rem 2rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .page-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .prediction-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+        
+        @media (max-width: 1024px) {
+            .prediction-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .input-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .result-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            min-height: 600px;
+        }
+        
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .range-value {
+            min-width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 0.5rem;
+            border-radius: 10px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: #e1e5e9;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+        
+        .result-placeholder {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+        
+        .result-placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .prediction-result {
+            text-align: center;
+        }
+        
+        .result-header {
+            margin-bottom: 2rem;
+        }
+        
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ── Fuel consumption display (LPH) ── */
+        .fuel-consumption {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.4rem;
+        }
+
+        /* ── Engine load display (%) ── */
+        .engine-load-display {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0369A1;
+            background: #E0F2FE;
+            border-radius: 20px;
+            padding: 0.35rem 1.1rem;
+            display: inline-block;
+            margin-bottom: 1.2rem;
+            letter-spacing: 0.02em;
+        }
+        
+        /* ── 5-zone fuel colour classes (match Chart 2 zone strip) ── */
+        .fuel-very-low  { color: #059669; }   /* < 4.0 LPH  */
+        .fuel-low       { color: #10B981; }   /* 4.0 – 6.5  */
+        .fuel-medium    { color: #F59E0B; }   /* 6.5 – 9.0  */
+        .fuel-high      { color: #EF4444; }   /* 9.0 – 12.0 */
+        .fuel-very-high { color: #DC2626; }   /* > 12.0 LPH */
+
+        .fuel-category {
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+
+        .category-very-low  { background: #D1FAE5; color: #065F46; }
+        .category-low       { background: #A7F3D0; color: #065F46; }
+        .category-medium    { background: #FEF3C7; color: #92400E; }
+        .category-high      { background: #FEE2E2; color: #991B1B; }
+        .category-very-high { background: #FECACA; color: #7F1D1D; }
+        
+        .profile-result {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-badge {
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: inline-block;
+        }
+        
+        .profile-aggressive   { background: #FFE4E6; color: #BE123C; }
+        .profile-moderate     { background: #DBEAFE; color: #1E40AF; }
+        .profile-eco-friendly { background: #D1FAE5; color: #065F46; }
+        .profile-city         { background: #FEF3C7; color: #92400E; }
+        .profile-highway      { background: #E0E7FF; color: #3730A3; }
+        
+        .graph-container {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .graph-image {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .insights-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .insights-section h4 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+        
+        .insight-icon {
+            font-size: 1.2rem;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .messages {
+            margin-bottom: 2rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">FuelNet AI Driver</div>
+            <div class="nav-links">
+                <a href="{% url 'user_dashboard' %}">Dashboard</a>
+                <a href="{% url 'view_predictions_user' %}">My Predictions</a>
+                <a href="{% url 'user_profile' %}">Profile</a>
+                <div class="user-info">
+                    <div class="user-avatar">{{ user.username.0|upper }}</div>
+                    <span>Hi, {{ user.username }}</span>
+                </div>
+                <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Real-time Fuel Consumption Prediction</h1>
+            <p>Enter your current driving parameters to get AI-powered fuel consumption analysis</p>
+        </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-error{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="prediction-container">
+            <!-- Input Form -->
+            <div class="input-card">
+                <h2 style="margin-bottom: 2rem; color: #333;">Enter Driving Parameters</h2>
+                <form method="POST" id="predictionForm">
+                    {% csrf_token %}
+                    <div class="input-grid">
+                        <div class="form-group">
+                            <label for="vehicle_speed">Vehicle Speed (km/h)</label>
+                            <div class="range-container">
+                                <input type="range" id="speed_range" min="0" max="180" value="60" class="form-control">
+                                <span class="range-value" id="speed_value">60</span>
+                            </div>
+                            <input type="number" id="vehicle_speed" name="vehicle_speed" class="form-control" value="60" min="0" max="180" step="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="engine_rpm">Engine RPM</label>
+                            <div class="range-container">
+                                <input type="range" id="rpm_range" min="600" max="7000" value="2500" class="form-control">
+                                <span class="range-value" id="rpm_value">2500</span>
+                            </div>
+                            <input type="number" id="engine_rpm" name="engine_rpm" class="form-control" value="2500" min="600" max="7000" step="100" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="throttle_position">Throttle Position (%)</label>
+                            <div class="range-container">
+                                <input type="range" id="throttle_range" min="0" max="100" value="50" class="form-control">
+                                <span class="range-value" id="throttle_value">50</span>
+                            </div>
+                            <input type="number" id="throttle_position" name="throttle_position" class="form-control" value="50" min="0" max="100" step="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="engine_load">Engine Load (%)</label>
+                            <div class="range-container">
+                                <input type="range" id="load_range" min="0" max="100" value="50" class="form-control">
+                                <span class="range-value" id="load_value">50</span>
+                            </div>
+                            <input type="number" id="engine_load" name="engine_load" class="form-control" value="50" min="0" max="100" step="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maf">Mass Air Flow (g/s)</label>
+                            <input type="number" id="maf" name="maf" class="form-control" value="25.5" min="1" max="100" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="intake_air_temp">Intake Air Temp (°C)</label>
+                            <input type="number" id="intake_air_temp" name="intake_air_temp" class="form-control" value="35" min="-20" max="60" step="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="acceleration">Acceleration (m/s²)</label>
+                            <input type="number" id="acceleration" name="acceleration" class="form-control" value="1.2" min="-3" max="5" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gear_position">Gear Position</label>
+                            <select id="gear_position" name="gear_position" class="form-control" required>
+                                <option value="1">1st Gear</option>
+                                <option value="2">2nd Gear</option>
+                                <option value="3" selected>3rd Gear</option>
+                                <option value="4">4th Gear</option>
+                                <option value="5">5th Gear</option>
+                                <option value="6">6th Gear</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary submit-btn">
+                        🚀 Analyze Fuel Consumption
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="result-card">
+                {% if prediction_result %}
+                <div class="prediction-result">
+                    <div class="result-header">
+                        <div class="result-icon">🎯</div>
+                        <h2 style="color: #333;">AI Prediction Results</h2>
+                    </div>
+
+                    <!-- Fuel consumption in LPH — colour matches the real zone -->
+                    <div class="fuel-consumption
+                        {% if prediction_result.fuel_category == 'Very Low' %}fuel-very-low
+                        {% elif prediction_result.fuel_category == 'Low' %}fuel-low
+                        {% elif prediction_result.fuel_category == 'Medium' %}fuel-medium
+                        {% elif prediction_result.fuel_category == 'High' %}fuel-high
+                        {% else %}fuel-very-high{% endif %}">
+                        {{ prediction_result.fuel_consumption }} LPH
+                    </div>
+
+                    <!-- Engine load always shown as XX% -->
+                    <div class="engine-load-display">
+                        ⚙️ Engine Load: {{ prediction_result.engine_load_display }}
+                    </div>
+
+                    <!-- Category badge — colour matches LPH zone -->
+                    <div class="fuel-category
+                        {% if prediction_result.fuel_category == 'Very Low' %}category-very-low
+                        {% elif prediction_result.fuel_category == 'Low' %}category-low
+                        {% elif prediction_result.fuel_category == 'Medium' %}category-medium
+                        {% elif prediction_result.fuel_category == 'High' %}category-high
+                        {% else %}category-very-high{% endif %}">
+                        {{ prediction_result.fuel_category }} Consumption
+                    </div>
+
+                    <div class="profile-result">
+                        <h4 style="margin-bottom: 1rem; color: #333;">Driving Profile</h4>
+                        <div class="profile-badge profile-{{ prediction_result.driving_profile|lower|slugify }}">
+                            {{ prediction_result.driving_profile }} Driver
+                        </div>
+                    </div>
+
+                    {% if prediction_result.graph_data %}
+                    <div class="graph-container">
+                        <h4 style="margin-bottom: 1rem; color: #333;">Detailed Analysis</h4>
+                        <img src="data:image/png;base64,{{ prediction_result.graph_data }}" alt="Fuel Consumption Analysis" class="graph-image">
+                    </div>
+                    {% endif %}
+
+                    <div class="insights-section">
+                        <h4>💡 AI Insights</h4>
+                        <div class="insight-item">
+                            <div class="insight-icon">📊</div>
+                            <div>
+                                <strong>Fuel Efficiency:</strong> 
+                                {% if prediction_result.fuel_category == 'Very Low' %}
+                                Excellent fuel efficiency — eco driving at its best
+                                {% elif prediction_result.fuel_category == 'Low' %}
+                                Excellent fuel efficiency for current driving conditions
+                                {% elif prediction_result.fuel_category == 'Medium' %}
+                                Moderate fuel consumption - room for optimization
+                                {% elif prediction_result.fuel_category == 'High' %}
+                                High fuel consumption - consider adjusting driving style
+                                {% else %}
+                                Very high fuel consumption - reduce throttle and RPM
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-icon">⚙️</div>
+                            <div>
+                                <strong>Engine Load:</strong>
+                                {{ prediction_result.engine_load_display }} —
+                                {% if prediction_result.engine_load_raw < 40 %}
+                                Low load, engine running efficiently
+                                {% elif prediction_result.engine_load_raw < 70 %}
+                                Moderate load, normal operating range
+                                {% else %}
+                                High engine load, increased fuel demand
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-icon">🚗</div>
+                            <div>
+                                <strong>Driving Style:</strong> 
+                                {{ prediction_result.driving_profile }} profile detected
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-icon">💡</div>
+                            <div>
+                                <strong>Recommendation:</strong> 
+                                {% if prediction_result.driving_profile == 'Eco-Friendly' %}
+                                Maintain current driving style for optimal efficiency
+                                {% elif prediction_result.driving_profile == 'Aggressive' %}
+                                Consider smoother acceleration and lower RPMs
+                                {% else %}
+                                Small adjustments can further improve fuel economy
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="result-placeholder">
+                    <div class="result-placeholder-icon">🤖</div>
+                    <h3 style="color: #666; margin-bottom: 1rem;">Awaiting Analysis</h3>
+                    <p style="color: #666; line-height: 1.6;">
+                        Enter your driving parameters and click "Analyze Fuel Consumption" to get AI-powered insights about your fuel efficiency and driving profile.
+                    </p>
+                    <div style="margin-top: 2rem; padding: 2rem; background: #f8f9fa; border-radius: 15px;">
+                        <h4 style="color: #333; margin-bottom: 1rem;">💡 Tips for Better Accuracy</h4>
+                        <ul style="text-align: left; color: #666; line-height: 1.6;">
+                            <li>Use real-time data from your vehicle's ECU for best results</li>
+                            <li>Ensure all parameters are within realistic operating ranges</li>
+                            <li>Update values based on current driving conditions</li>
+                            <li>Consider traffic, road grade, and weather conditions</li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Range slider functionality
+        const speedRange = document.getElementById('speed_range');
+        const speedValue = document.getElementById('speed_value');
+        const speedInput = document.getElementById('vehicle_speed');
+
+        const rpmRange = document.getElementById('rpm_range');
+        const rpmValue = document.getElementById('rpm_value');
+        const rpmInput = document.getElementById('engine_rpm');
+
+        const throttleRange = document.getElementById('throttle_range');
+        const throttleValue = document.getElementById('throttle_value');
+        const throttleInput = document.getElementById('throttle_position');
+
+        const loadRange = document.getElementById('load_range');
+        const loadValue = document.getElementById('load_value');
+        const loadInput = document.getElementById('engine_load');
+
+        // Sync range sliders with number inputs
+        function syncInputs(rangeElement, valueElement, inputElement) {
+            rangeElement.addEventListener('input', function() {
+                valueElement.textContent = this.value;
+                inputElement.value = this.value;
+            });
+
+            inputElement.addEventListener('input', function() {
+                rangeElement.value = this.value;
+                valueElement.textContent = this.value;
+            });
+        }
+
+        syncInputs(speedRange, speedValue, speedInput);
+        syncInputs(rpmRange, rpmValue, rpmInput);
+        syncInputs(throttleRange, throttleValue, throttleInput);
+        syncInputs(loadRange, loadValue, loadInput);
+
+        // Form submission animation
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('.submit-btn');
+            submitBtn.innerHTML = '🔄 Analyzing...';
+            submitBtn.disabled = true;
+            
+            // Re-enable after 3 seconds in case of error
+            setTimeout(() => {
+                submitBtn.innerHTML = '🚀 Analyze Fuel Consumption';
+                submitBtn.disabled = false;
+            }, 3000);
+        });
+
+        // Real-time parameter validation
+        const inputs = document.querySelectorAll('input[type="number"]');
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const min = parseFloat(this.min);
+                const max = parseFloat(this.max);
+                const value = parseFloat(this.value);
+                
+                if (value < min) this.value = min;
+                if (value > max) this.value = max;
+            });
+        });
+    </script>
+</body>
+</html>

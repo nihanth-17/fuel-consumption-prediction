@@ -1,0 +1,32 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: fuelnet_db
+      MYSQL_USER: fuelnet
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes: [mysql-data:/var/lib/mysql]
+  app:
+    build: .
+    ports: ["8080:8080"]
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: mysql
+      DB_USER: fuelnet
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      FUELNET_COOKIE_SECURE: "true"
+    depends_on:
+      mysql: {condition: service_healthy}
+  caddy:
+    image: caddy:2.8
+    ports: ["80:80", "443:443"]
+    environment: [FUELNET_DOMAIN=${FUELNET_DOMAIN}]
+    volumes: [./Caddyfile:/etc/caddy/Caddyfile:ro,caddy-data:/data,caddy-config:/config]
+    depends_on: [app]
+volumes: {mysql-data: {}, caddy-data: {}, caddy-config: {}}

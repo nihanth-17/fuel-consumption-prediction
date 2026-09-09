@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - FuelNet AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+        
+        .nav-links a:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .container {
+            padding: 8rem 2rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .page-header h1 {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .page-header p {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .about-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 4rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .mission-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .mission-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .mission-section p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .team-section {
+            text-align: center;
+            margin: 4rem 0;
+        }
+        
+        .team-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .team-member {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .member-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .member-role {
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-section {
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 3rem;
+            margin-top: 4rem;
+        }
+        
+        .contact-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .contact-item {
+            text-align: center;
+        }
+        
+        .contact-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+        
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 4rem;
+            border-radius: 0 0 25px 25px;
+        }
+        
+        .back-home {
+            text-align: center;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">FuelNet AI</div>
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="#mission">Mission</a>
+                <a href="#features">Features</a>
+                <a href="#team">Team</a>
+                <a href="{% url 'user_login' %}" class="btn btn-secondary">User Login</a>
+                <a href="{% url 'admin_login' %}" class="btn btn-primary">Admin Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>About FuelNet AI</h1>
+            <p>Revolutionizing fuel efficiency through advanced machine learning and real-time data analysis</p>
+        </div>
+
+        <div class="about-content">
+            <section class="mission-section" id="mission">
+                <h2>Our Mission</h2>
+                <p>
+                    FuelNet AI is dedicated to transforming the way drivers understand and optimize their fuel consumption. 
+                    By leveraging cutting-edge machine learning algorithms and real-time ECU data analysis, we provide 
+                    unprecedented insights into driving patterns and fuel efficiency.
+                </p>
+                <p>
+                    Our platform empowers both individual drivers and fleet managers to make data-driven decisions, 
+                    reduce fuel costs, and minimize environmental impact through intelligent driving profile classification 
+                    and predictive analytics.
+                </p>
+            </section>
+
+            <section class="features-grid" id="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Advanced AI Algorithms</h3>
+                    <p>Utilizing Random Forest ensemble methods for highly accurate fuel consumption predictions and driving profile classification.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Real-time Analysis</h3>
+                    <p>Process ECU data in real-time to provide instant insights and recommendations for optimal driving behavior.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Comprehensive Analytics</h3>
+                    <p>Detailed visualizations and reports that help understand driving patterns and fuel consumption trends.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Environmental Impact</h3>
+                    <p>Help reduce carbon footprint by promoting fuel-efficient driving habits and optimal vehicle performance.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚗</div>
+                    <h3>Vehicle Optimization</h3>
+                    <p>Personalized recommendations based on your specific vehicle model and driving conditions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Data Security</h3>
+                    <p>Enterprise-grade security ensuring your driving data remains private and protected at all times.</p>
+                </div>
+            </section>
+
+            <section class="team-section" id="team">
+                <h2>Our Team</h2>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-avatar">AI</div>
+                        <div class="member-name">AI Research Team</div>
+                        <div class="member-role">Machine Learning Experts</div>
+                        <p>Specialized in developing advanced predictive models and classification algorithms.</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">DE</div>
+                        <div class="member-name">Data Engineers</div>
+                        <div class="member-role">Data Processing Specialists</div>
+                        <p>Experts in handling real-time ECU data streams and ensuring data quality.</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">FE</div>
+                        <div class="member-name">Frontend Team</div>
+                        <div class="member-role">UI/UX Designers</div>
+                        <p>Creating intuitive and beautiful interfaces for seamless user experience.</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">BE</div>
+                        <div class="member-name">Backend Team</div>
+                        <div class="member-role">System Architects</div>
+                        <p>Building robust and scalable infrastructure to handle millions of predictions.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="contact-section">
+                <h2>Get In Touch</h2>
+                <p>Have questions or want to learn more about FuelNet AI? We'd love to hear from you.</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">📧</div>
+                        <h4>Email</h4>
+                        <p>contact@fuelnet-ai.com</p>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">🌐</div>
+                        <h4>Website</h4>
+                        <p>www.fuelnet-ai.com</p>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">🏢</div>
+                        <h4>Office</h4>
+                        <p>Tech Innovation Center</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="back-home">
+            <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Mansoor&copy; 2024 FuelNet AI. Revolutionizing fuel efficiency through machine learning.</p>
+        <p>Advanced ECU Data Analysis | Real-time Predictions | Driving Profile Classification</p>
+    </footer>
+</body>
+</html>
